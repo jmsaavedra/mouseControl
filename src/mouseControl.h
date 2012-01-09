@@ -3,8 +3,6 @@
 //  mouseControlExample
 //
 //  Created by joseph saavedra on 1/9/12.
-//  Copyright 2012 Saavedra. All rights reserved.
-//
 
 #pragma once
 
@@ -17,25 +15,45 @@ class mouseControl {
 public:
     
     mouseControl();
+    void setup();
     void update();
     
     void move(ofPoint myMouse);
-    void leftClickUp(ofPoint myMouse);
-    void leftClickDown(ofPoint myMouse);
-    void rightClick(ofPoint myMouse);
+    void leftButtonUp(ofPoint myMouse);
+    void leftButtonDown(ofPoint myMouse);
+    void rightButtonUp(ofPoint myMouse);
+    void rightButtonDown(ofPoint myMouse);
     void leftMouseDragged(ofPoint myMouse);
-    
-    bool mouseMoved;
-    bool moved(ofPoint myMouse);
+    void rightMouseDragged(ofPoint myMouse);
     
     bool mLeftButton;
     bool getLeftButton();
+    bool mRightButton;
+    bool getRightButton();
     
-    ofPoint prevMouse;
+    bool draggingLeftButton;
+    bool draggingRightButton;
     
-    //CGEventRef move;            //move
-    CGEventRef click1_down;     //left click down
-    CGEventRef click1_up;       //left click up
-    CGEventRef leftDragged;
+    CGEventSourceRef source;
+    
+    CGPoint mouseCursorPosition;
+    
+    //event refs
+    CGEventRef mouseEventMove;
+    CGEventRef mouseEventLeftDown;     //left click down
+    CGEventRef mouseEventLeftUp;       //left click up
+    CGEventRef mouseEventLeftDragged; //left dragged
+    CGEventRef mouseEventRightDown;     //left click down
+    CGEventRef mouseEventRightUp;       //left click up
+    CGEventRef mouseEventRightDragged; //left dragged
+    
+    //event types
+    CGEventType eventTypeMouseMoved;
+    CGEventType eventTypeLeftMouseDown;
+    CGEventType eventTypeLeftMouseUp;
+    CGEventType eventTypeLeftDragged;
+    CGEventType eventTypeRightMouseDown;
+    CGEventType eventTypeRightMouseUp;
+    CGEventType eventTypeRightDragged;
 };
 

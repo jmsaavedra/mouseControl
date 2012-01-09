@@ -7,8 +7,8 @@ working:
 - move mouse
 - left button press/release
 - left button drag
+- right button press/release
 
 needs:
-- mouse events when oF app is not in focus (move already does this)
-- right button press/release
+- mouse events when oF app is not in focus
 - windows methods

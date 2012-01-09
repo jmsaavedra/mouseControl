@@ -26,8 +26,10 @@ class testApp : public ofBaseApp{
     int myMouseX;
     int myMouseY;
         
-    bool    rect1;
-    bool    rect2;
+    bool    rect1L;
+    bool    rect2L;
+    bool    rect1R;
+    bool    rect2R;
     
     float   rect_size;
     float   rect1_x, rect1_y;
@@ -35,5 +37,7 @@ class testApp : public ofBaseApp{
     
     ofColor on;
     ofColor off;
+    
+    string event;
 		
 };

@@ -3,30 +3,37 @@
 //  mouseControlExample
 //
 //  Created by joseph saavedra on 1/9/12.
-//  Copyright 2012 Saavedra. All rights reserved.
-//
+
+/* 
+ 
+ derived from examples found 
+ here: http://stackoverflow.com/questions/2734117/simulating-mouse-input-programmatically-in-os-x
+ and here: http://stackoverflow.com/questions/4051587/apple-events-to-control-mouse-remotely
+ 
+*/
 
 #include <iostream>
 
 #include "mouseControl.h"
 
 mouseControl::mouseControl(){
-    prevMouse.x = 0;
-    prevMouse.y = 0;
-    mouseMoved = false;
-    mLeftButton = false;
+
 }
 
-//----- move mouse -------------
-void mouseControl::move(ofPoint myMouse){
+void mouseControl::setup(){
+    mLeftButton = false;
+    mRightButton = false;
+    draggingLeftButton = false;
+    draggingRightButton = false;
     
-    CGEventRef move = CGEventCreateMouseEvent(
-                                              NULL, kCGEventMouseMoved,
-                                              CGPointMake(myMouse.x, myMouse.y),
-                                              kCGMouseButtonLeft // ignored
-                                              );
-    CGEventPost(kCGHIDEventTap, move);
-    CFRelease(move);
+    eventTypeMouseMoved = kCGEventMouseMoved;
+    eventTypeLeftDragged = kCGEventLeftMouseDragged;
+    eventTypeLeftMouseDown = kCGEventLeftMouseDown;
+    eventTypeLeftMouseUp = kCGEventLeftMouseUp;
+    
+    eventTypeRightDragged = kCGEventRightMouseDragged;
+    eventTypeRightMouseDown = kCGEventRightMouseDown;
+    eventTypeRightMouseUp = kCGEventRightMouseUp;  
     
 }
 
@@ -35,46 +42,63 @@ void mouseControl::update(){
     
 }
 
-//-------- move ---------------
-
-bool mouseControl::moved(ofPoint myMouse){
+//----- move mouse ----------------
+void mouseControl::move(ofPoint myMouse){
     
-    if (prevMouse.x != myMouse.x  || prevMouse.y != myMouse.y){ 
-        prevMouse.x = myMouse.x;
-        prevMouse.y = myMouse.y;
-        return true;
-    }
-    else return false;
+    mouseCursorPosition.x = myMouse.x;
+    mouseCursorPosition.y = myMouse.y;
+    
+    mouseEventMove = CGEventCreateMouseEvent ( CGEventSourceCreate(NULL),
+                                                         eventTypeMouseMoved,
+                                                         mouseCursorPosition,
+                                                         kCGMouseButtonLeft);//ignored
+                                                //kCGMouseButtonRight);
+                                                  //kCGMouseButtonLeft); 
+    CGEventSetType(mouseEventMove, kCGEventMouseMoved); // Fix Apple Bug
+    CGEventPost( kCGSessionEventTap, mouseEventMove );
+    
+    //if(ofGetElapsedTimef() > 1000)
+       CFRelease(mouseEventMove);
 }
 
 //-------- left mouse button -------------------
-void mouseControl::leftClickDown(ofPoint myMouse){
+
+void mouseControl::leftButtonDown(ofPoint myMouse){
     
-    click1_down = CGEventCreateMouseEvent(
-                                          NULL, kCGEventLeftMouseDown,
-                                          CGPointMake(myMouse.x, myMouse.y),
-                                          kCGMouseButtonLeft
-                                          );
-    CGEventPost(kCGHIDEventTap, click1_down);
-    CFRelease(click1_down);
+    mouseCursorPosition.x = myMouse.x;
+    mouseCursorPosition.y = myMouse.y;
+    CGMouseButton mouseButton = kCGMouseButtonLeft;
+    
+    mouseEventLeftDown = CGEventCreateMouseEvent (  CGEventSourceCreate(NULL),
+                                                 eventTypeLeftMouseDown,
+                                                 mouseCursorPosition,
+                                                 kCGMouseButtonLeft );
+    CGEventSetType(mouseEventLeftDown, kCGEventLeftMouseDown); // Fix Apple Bug
+    CGEventPost( kCGSessionEventTap, mouseEventLeftDown );
+    
+    CFRelease(mouseEventLeftDown);
     mLeftButton = true;
 }
 
-void mouseControl::leftClickUp(ofPoint myMouse){
+void mouseControl::leftButtonUp(ofPoint myMouse){
     
-    click1_up = CGEventCreateMouseEvent(
-                                        NULL, kCGEventLeftMouseUp,
-                                        CGPointMake(myMouse.x, myMouse.y),
-                                        kCGMouseButtonLeft
-                                        );
-    cout << click1_up <<endl;
-    CGEventPost(kCGHIDEventTap, click1_up);
+    mouseCursorPosition.x = myMouse.x;
+    mouseCursorPosition.y = myMouse.y;
+    CGMouseButton mouseButton = kCGMouseButtonLeft;
     
-    CFRelease(click1_up);
+    mouseEventLeftUp = CGEventCreateMouseEvent (  CGEventSourceCreate(NULL),
+                                                  eventTypeLeftMouseDown,
+                                                  mouseCursorPosition,
+                                                  kCGMouseButtonLeft );
+    CGEventSetType(mouseEventLeftUp, kCGEventLeftMouseUp); // Fix Apple Bug
+    CGEventPost( kCGSessionEventTap, mouseEventLeftUp );
     
-    //leftMouseDragged(x, y);
-    //CFRelease(leftDragged);
+    CFRelease(mouseEventLeftUp);
     mLeftButton = false;
+    if(draggingLeftButton){
+        CFRelease(mouseEventLeftDragged);
+        draggingLeftButton = false;
+    }
 }
 
 bool mouseControl::getLeftButton(){
@@ -82,89 +106,77 @@ bool mouseControl::getLeftButton(){
 }
 
 
-//-------------- mouse dragged ----------------
+//-------- right mouse press -------------------
+
+void mouseControl::rightButtonDown(ofPoint myMouse){
+    mouseCursorPosition.x = myMouse.x;
+    mouseCursorPosition.y = myMouse.y;
+    CGMouseButton mouseButton = kCGMouseButtonRight;
+    
+    mouseEventRightDown = CGEventCreateMouseEvent (  CGEventSourceCreate(NULL),
+                                                 eventTypeRightMouseDown,
+                                                 mouseCursorPosition,
+                                                 kCGMouseButtonRight );
+    CGEventSetType(mouseEventRightDown, kCGEventRightMouseDown); // Fix Apple Bug
+    CGEventPost( kCGSessionEventTap, mouseEventRightDown );
+    CFRelease(mouseEventRightDown);
+    mRightButton = true;    
+}
+
+void mouseControl::rightButtonUp(ofPoint myMouse){
+    mouseCursorPosition.x = myMouse.x;
+    mouseCursorPosition.y = myMouse.y;
+    CGMouseButton mouseButton = kCGMouseButtonRight;
+    
+    mouseEventRightUp = CGEventCreateMouseEvent (  CGEventSourceCreate(NULL),
+                                                      eventTypeRightMouseUp,
+                                                      mouseCursorPosition,
+                                                      kCGMouseButtonRight );
+    CGEventSetType(mouseEventRightUp, kCGEventRightMouseUp); // Fix Apple Bug
+    CGEventPost( kCGSessionEventTap, mouseEventRightUp );
+    CFRelease(mouseEventRightUp);
+    mRightButton = false;
+    if(draggingRightButton){
+        CFRelease(mouseEventRightDragged);
+        draggingRightButton = false;
+    }
+}
+
+bool mouseControl::getRightButton(){
+    return mRightButton;
+}
+
+
+
+//------- mouse dragged ------------------------
+
 void mouseControl::leftMouseDragged(ofPoint myMouse){
     
-    CGEventSourceRef source = CGEventSourceCreate(NULL);
-    CGEventType eventType = kCGEventLeftMouseDragged;
-    CGPoint mouseCursorPosition;
     mouseCursorPosition.x = myMouse.x;
     mouseCursorPosition.y = myMouse.y;
     CGMouseButton mouseButton = kCGMouseButtonLeft;
     
-    CGEventRef mouseEvent = CGEventCreateMouseEvent ( source,
-                                                     eventType,
+    mouseEventLeftDragged = CGEventCreateMouseEvent (  CGEventSourceCreate(NULL),
+                                                     eventTypeLeftDragged,
                                                      mouseCursorPosition,
-                                                     mouseButton );
-    CGEventSetType(mouseEvent, kCGEventLeftMouseDragged); // Fix Apple Bug
-    CGEventPost( kCGSessionEventTap, mouseEvent );
-    CFRelease(mouseEvent);
-
-
-    
-    /*leftDragged = CGEventCreateMouseEvent(
-                                          NULL, kCGEventLeftMouseDragged, 
-                                          CGPointMake(x, y), 
-                                          kCGMouseButtonLeft);
-    
-    CGEventPost(kCGHIDEventTap, leftDragged);*/
-    
-    //CFRelease(leftDragged);
+                                                     kCGMouseButtonLeft );
+    CGEventSetType(mouseEventLeftDragged, kCGEventLeftMouseDragged); // Fix Apple Bug
+    CGEventPost( kCGSessionEventTap, mouseEventLeftDragged );
+    draggingLeftButton = true;
 }
 
-
-//------------- right mouse press
-void mouseControl::rightClick(ofPoint myMouse){
+void mouseControl::rightMouseDragged(ofPoint myMouse){
     
+    mouseCursorPosition.x = myMouse.x;
+    mouseCursorPosition.y = myMouse.y;
+    CGMouseButton mouseButton = kCGMouseButtonRight;
     
+    mouseEventRightDragged = CGEventCreateMouseEvent (  CGEventSourceCreate(NULL),
+                                                      eventTypeRightDragged,
+                                                      mouseCursorPosition,
+                                                      kCGMouseButtonRight );
+    CGEventSetType(mouseEventRightDragged, kCGEventRightMouseDragged); // Fix Apple Bug
+    CGEventPost( kCGSessionEventTap, mouseEventRightDragged );
+    draggingRightButton = true;
     
 }
-
-
-/*
- 
- //source example came from: http://stackoverflow.com/questions/2734117/simulating-mouse-input-programmatically-in-os-x
- 
- 
- int main() {
- // Move to 200x200
- CGEventRef move1 = CGEventCreateMouseEvent(
- NULL, kCGEventMouseMoved,
- CGPointMake(200, 200),
- kCGMouseButtonLeft // ignored
- );
- // Move to 250x250
- CGEventRef move2 = CGEventCreateMouseEvent(
- NULL, kCGEventMouseMoved,
- CGPointMake(250, 250),
- kCGMouseButtonLeft // ignored
- );
- // Left button down at 250x250
- CGEventRef click1_down = CGEventCreateMouseEvent(
- NULL, kCGEventLeftMouseDown,
- CGPointMake(250, 250),
- kCGMouseButtonLeft
- );
- // Left button up at 250x250
- CGEventRef click1_up = CGEventCreateMouseEvent(
- NULL, kCGEventLeftMouseUp,
- CGPointMake(250, 250),
- kCGMouseButtonLeft
- );
- 
- // Now, execute these events with an interval to make them noticeable
- CGEventPost(kCGHIDEventTap, move1);
- sleep(1);
- CGEventPost(kCGHIDEventTap, move2);
- sleep(1);
- CGEventPost(kCGHIDEventTap, click1_down);
- CGEventPost(kCGHIDEventTap, click1_up);
- 
- // Release the events
- CFRelease(click1_up);
- CFRelease(click1_down);
- CFRelease(move2);
- CFRelease(move1);
- 
- return 0;
- }*/

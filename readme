@@ -1,6 +1,6 @@
 openFrameworks app to simulate mouse events ---
 
-currently only for OS X, uses cocoa to create quartz events 
+currently only for OS X, 'mouseControl' class uses cocoa to create quartz events 
 from C++ lib (http://openframework.cc)
 
 working:
@@ -11,3 +11,4 @@ working:
 needs:
 - mouse events when oF app is not in focus (move already does this)
 - right button press/release
+- windows methods

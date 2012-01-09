@@ -12,3 +12,9 @@ working:
 needs:
 - mouse events when oF app is not in focus
 - windows methods
+
+use:
+- use ARROW keys to move mouse
+- press '1' to left click
+- press and hold '1' while move to drag
+- press '2' to right click

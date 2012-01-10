@@ -24,7 +24,7 @@ basic use:
 
 methods:
 
-    void move(ofPoint myMouse);
+    void move(ofPoint myMousePosition);
     void leftButtonUp(ofPoint myMousePosition);
     void leftButtonDown(ofPoint myMousePosition);
     void rightButtonUp(ofPoint myMousePosition);

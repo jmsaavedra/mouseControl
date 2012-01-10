@@ -10,6 +10,9 @@
  here: http://stackoverflow.com/questions/2734117/simulating-mouse-input-programmatically-in-os-x
  and here: http://stackoverflow.com/questions/4051587/apple-events-to-control-mouse-remotely
  
+ Quartz Event Reference:
+http://developer.apple.com/library/mac/#documentation/Carbon/Reference/QuartzEventServicesRef/Reference/reference.html
+ 
 */
 
 #include <iostream>
@@ -26,15 +29,16 @@ void mouseControl::setup(){
     draggingLeftButton = false;
     draggingRightButton = false;
     
+    //moved
     eventTypeMouseMoved = kCGEventMouseMoved;
+    //left button
     eventTypeLeftDragged = kCGEventLeftMouseDragged;
     eventTypeLeftMouseDown = kCGEventLeftMouseDown;
     eventTypeLeftMouseUp = kCGEventLeftMouseUp;
-    
+    //right button
     eventTypeRightDragged = kCGEventRightMouseDragged;
     eventTypeRightMouseDown = kCGEventRightMouseDown;
     eventTypeRightMouseUp = kCGEventRightMouseUp;  
-    
 }
 
 void mouseControl::update(){
@@ -47,18 +51,14 @@ void mouseControl::move(ofPoint myMouse){
     
     mouseCursorPosition.x = myMouse.x;
     mouseCursorPosition.y = myMouse.y;
-    
     mouseEventMove = CGEventCreateMouseEvent ( CGEventSourceCreate(NULL),
                                                          eventTypeMouseMoved,
                                                          mouseCursorPosition,
                                                          kCGMouseButtonLeft);//ignored
-                                                //kCGMouseButtonRight);
-                                                  //kCGMouseButtonLeft); 
     CGEventSetType(mouseEventMove, kCGEventMouseMoved); // Fix Apple Bug
     CGEventPost( kCGSessionEventTap, mouseEventMove );
     
-    //if(ofGetElapsedTimef() > 1000)
-       CFRelease(mouseEventMove);
+    CFRelease(mouseEventMove);
 }
 
 //-------- left mouse button -------------------
@@ -94,6 +94,7 @@ void mouseControl::leftButtonUp(ofPoint myMouse){
     CGEventPost( kCGSessionEventTap, mouseEventLeftUp );
     
     CFRelease(mouseEventLeftUp);
+    
     mLeftButton = false;
     if(draggingLeftButton){
         CFRelease(mouseEventLeftDragged);
@@ -178,5 +179,4 @@ void mouseControl::rightMouseDragged(ofPoint myMouse){
     CGEventSetType(mouseEventRightDragged, kCGEventRightMouseDragged); // Fix Apple Bug
     CGEventPost( kCGSessionEventTap, mouseEventRightDragged );
     draggingRightButton = true;
-    
 }

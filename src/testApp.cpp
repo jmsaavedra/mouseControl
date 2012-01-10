@@ -139,16 +139,21 @@ void testApp::mouseMoved(int x, int y ){
 //--------------------------------------------------------------
 void testApp::mouseDragged(int x, int y, int button){
     
-    event = "left mouse button dragged x: " + ofToString(x) + " y: " + ofToString(y);
-    cout << event << endl;
-    
-    if(rect1L){
-        rect1_x = x - rect_size/2;
-        rect1_y = y - rect_size/2;
+    if(button == 0){ 
+        event = "left mouse button dragged x: " + ofToString(x) + " y: " + ofToString(y);
+        cout << event << endl;
+        
+        if(rect1L){
+            rect1_x = x - rect_size/2;
+            rect1_y = y - rect_size/2;
+        }
+        else if(rect2L){
+            rect2_x = x - rect_size/2;
+            rect2_y = y - rect_size/2;
+        }
     }
-    else if(rect2L){
-        rect2_x = x - rect_size/2;
-        rect2_y = y - rect_size/2;
+    else if(button == 2){
+        event = "right mouse button dragged x: " + ofToString(x) + " y: " + ofToString(y);
     }
 }
 

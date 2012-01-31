@@ -18,6 +18,7 @@ http://developer.apple.com/library/mac/#documentation/Carbon/Reference/QuartzEve
 #include <iostream>
 
 #include "mouseControl.h"
+#include "testApp.h"
 
 mouseControl::mouseControl(){
 
@@ -39,15 +40,37 @@ void mouseControl::setup(){
     eventTypeRightDragged = kCGEventRightMouseDragged;
     eventTypeRightMouseDown = kCGEventRightMouseDown;
     eventTypeRightMouseUp = kCGEventRightMouseUp;  
+    
+    myMouse = (0,0);
+    mouseCursorPosition.x = 0;
+    mouseCursorPosition.y = 0;
+    
+    //move(myMouse);
+    
+    //simulateDemo "moveThenClick()" vars
+    pressWaitTime = true;
+    releaseWaitTime = true;
+    moving = false;
 }
+
 
 void mouseControl::update(){
     
-    
+    if (moving) moveThenClick(); //only needed for experimental methods
 }
 
 //----- move mouse ----------------
-void mouseControl::move(ofPoint myMouse){
+
+void mouseControl::move(int x, int y){
+    ofPoint newMouse;
+    newMouse.x = x;
+    newMouse.y = y;
+    move(newMouse);
+}
+
+void mouseControl::move(ofPoint _myMouse){
+    
+    myMouse = _myMouse;
     
     mouseCursorPosition.x = myMouse.x;
     mouseCursorPosition.y = myMouse.y;
@@ -61,7 +84,7 @@ void mouseControl::move(ofPoint myMouse){
     CFRelease(mouseEventMove);
 }
 
-//-------- left mouse button -------------------
+//-------- left mouse press -------------------
 
 void mouseControl::leftButtonDown(ofPoint myMouse){
     
@@ -78,6 +101,7 @@ void mouseControl::leftButtonDown(ofPoint myMouse){
     
     CFRelease(mouseEventLeftDown);
     mLeftButton = true;
+
 }
 
 void mouseControl::leftButtonUp(ofPoint myMouse){
@@ -147,8 +171,6 @@ bool mouseControl::getRightButton(){
     return mRightButton;
 }
 
-
-
 //------- mouse dragged ------------------------
 
 void mouseControl::leftMouseDragged(ofPoint myMouse){
@@ -179,4 +201,73 @@ void mouseControl::rightMouseDragged(ofPoint myMouse){
     CGEventSetType(mouseEventRightDragged, kCGEventRightMouseDragged); // Fix Apple Bug
     CGEventPost( kCGSessionEventTap, mouseEventRightDragged );
     draggingRightButton = true;
+}
+
+
+//------- move then click -------------------------
+//an experiment: 
+//will move mouse to specified ofPoint, then left click and release.
+
+bool mouseControl::moveThenClick(ofPoint _toWhere){
+    
+    toWhere = _toWhere;
+    cout << "moveThenClick: " << toWhere.x << " " << toWhere.y << endl;
+    moving = true;
+    
+    currMouse.x = ((testApp*)ofGetAppPtr())->myMouse.x;
+    currMouse.y = ((testApp*)ofGetAppPtr())->myMouse.y;
+    
+    moveThenClick();
+}
+
+bool mouseControl::moveThenClick(){
+    
+    //moveThenClick(toWhere);
+        
+    xRemaining = toWhere.x - currMouse.x;
+    yRemaining = toWhere.y - currMouse.y;
+    
+    if (abs(yRemaining) > 2 || abs(xRemaining) > 2){
+        currMouse.y += yRemaining*0.019;
+        currMouse.x += xRemaining*0.019;
+        move(currMouse);
+        //moving = true;
+        //cout << "move "<< currMouse.x << " " << currMouse.y << endl;
+        //cout << "Remaining "<< xRemaining << " " << yRemaining << endl;
+        
+    } //else moving = false;
+    
+    if (abs(yRemaining) <= 2 && abs(xRemaining) <= 2){
+        
+        if (pressWaitTime){
+            cout << "button down on target"<< endl;
+            //click
+            leftButtonDown(currMouse);
+            timeStmp = ofGetElapsedTimef();
+            pressWaitTime = false;
+        }
+        
+        if (ofGetElapsedTimef() - timeStmp > 0.3f){ //press and hold wait time
+            
+            if (releaseWaitTime){
+                leftButtonUp(currMouse);
+                cout << "button should be up" << endl;
+                timeStmp = ofGetElapsedTimef();
+                releaseWaitTime = false;
+            }
+            if (ofGetElapsedTimef() - timeStmp > 1.0f){ //wait time after release
+                pressWaitTime = true;       //reset both to true
+                releaseWaitTime = true;
+                ((testApp*)ofGetAppPtr())->myMouse = currMouse; //tell app where we left the mouse
+                moving = false;
+                cout << "moving now false" << endl;
+            } //else moving = true;                
+        }//else moving = true;   
+    }
+}
+
+bool mouseControl::getMoving(){
+
+    return moving;
+    //if (moving) moveThenClick();
 }

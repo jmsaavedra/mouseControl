@@ -18,6 +18,7 @@ public:
     void setup();
     void update();
     
+    void move(int x, int y);
     void move(ofPoint myMouse);
     void leftButtonUp(ofPoint myMouse);
     void leftButtonDown(ofPoint myMouse);
@@ -25,6 +26,10 @@ public:
     void rightButtonDown(ofPoint myMouse);
     void leftMouseDragged(ofPoint myMouse);
     void rightMouseDragged(ofPoint myMouse);
+    
+    bool moveThenClick(ofPoint toWhere);
+    bool moveThenClick();
+    bool getMoving();
     
     bool mLeftButton;
     bool getLeftButton();
@@ -37,6 +42,7 @@ public:
     CGEventSourceRef source;
     
     CGPoint mouseCursorPosition;
+    ofPoint myMouse;
     
     //event refs
     CGEventRef mouseEventMove;
@@ -55,5 +61,15 @@ public:
     CGEventType eventTypeRightMouseDown;
     CGEventType eventTypeRightMouseUp;
     CGEventType eventTypeRightDragged;
+    
+    //moveAndClick vars
+    bool moving;
+    float yRemaining;
+    float xRemaining;
+    bool pressWaitTime;
+    bool releaseWaitTime;
+    float timeStmp;
+    ofPoint toWhere;
+    ofPoint currMouse;
 };
 

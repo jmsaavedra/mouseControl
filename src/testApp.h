@@ -20,24 +20,40 @@ class testApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
     
-    mouseControl mouser;
-    ofPoint myMouse;
-    
-    int myMouseX;
-    int myMouseY;
+        mouseControl mouser;
+        ofPoint myMouse;
         
-    bool    rect1L;
-    bool    rect2L;
-    bool    rect1R;
-    bool    rect2R;
+        ofTrueTypeFont	font;   
     
-    float   rect_size;
-    float   rect1_x, rect1_y;
-    float   rect2_x, rect2_y;
     
-    ofColor on;
-    ofColor off;
+        string event;
+        string event2;
+        string event3;
     
-    string event;
-		
+        //int myMouseX;
+        //int myMouseY;
+            
+        bool    rect1L;
+        bool    rect2L;
+        bool    rect1R;
+        bool    rect2R;
+        
+        float   rect_size;
+        float   rect1_x, rect1_y;
+        float   rect2_x, rect2_y;
+        
+        ofColor on;
+        ofColor off;
+        
+        bool chaosDemo;  
+        int chaosCounter;
+        bool simulateDemo;
+
+        ofPoint target[100];
+    
+        int currTarget;
+        int ctr;
+    
+
+
 };

@@ -41,7 +41,7 @@ void mouseControl::setup(){
     eventTypeRightMouseDown = kCGEventRightMouseDown;
     eventTypeRightMouseUp = kCGEventRightMouseUp;  
     
-    myMouse = (0,0);
+    //myMouse = (0,0);
     mouseCursorPosition.x = 0;
     mouseCursorPosition.y = 0;
     
